@@ -1,0 +1,59 @@
+commands to run docker on aws ubuntu as docker image
+=====================================================
+
+
+# Update
+sudo apt update
+
+# Install Docker
+sudo apt install -y docker.io
+
+# Enable Docker
+sudo systemctl start docker
+sudo systemctl enable docker
+
+# Install Docker Compose
+sudo apt install -y docker-compose
+
+
+#Create directory kafka-docker
+mkdir kafka-docker && cd kafka-docker
+
+#create and open docker-compose.yml file
+nano docker-compose.yml
+
+
+docker-compose.yml
+==================
+version: '3'
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://<your-ec2-public-ip>:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+-----------------------
+
+Save and exit (Ctrl+O, Enter, Ctrl+X).
+
+#To run docker compose
+sudo docker-compose up -d
+
+#To check running images
+sudo docker ps
+
+
+
+
